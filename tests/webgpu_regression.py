@@ -43,8 +43,10 @@ with TemporaryDirectory(prefix='patina-webgpu-') as temp:
         with sync_playwright() as p:
             browser = p.chromium.launch(channel='chrome', headless=True, args=[
                 '--enable-unsafe-webgpu', '--enable-unsafe-swiftshader',
-                '--use-angle=vulkan', '--use-vulkan=swiftshader',
-                '--enable-features=Vulkan', '--disable-vulkan-surface',
+                # SwANGLE implements the GL compositor as well as WebGPU.
+                # Native ANGLE/Vulkan needs surface extensions absent from
+                # Chrome's bundled SwiftShader ICD.
+                '--use-gl=angle', '--use-angle=swiftshader',
                 '--disable-dev-shm-usage',
             ])
             try:
