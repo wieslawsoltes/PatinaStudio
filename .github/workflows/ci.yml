@@ -1,0 +1,41 @@
+name: Validate PatinaStudio
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm test
+      - run: node examples/library-usage.mjs
+      - run: npm run build
+      - run: npm run pack:libs
+      - name: Install browser test tooling
+        run: |
+          python -m pip install playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Test repository subpath, IndexedDB and actual module-worker loading
+        run: python tests/pages_smoke.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: patinastudio-validation
+          path: |
+            test-artifacts
+            archives
+            dist

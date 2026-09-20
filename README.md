@@ -11,6 +11,7 @@ This repository contains a working editor, not a screenshot mockup. Brush stroke
 Install Node.js 20 or later, then:
 
 ```sh
+git clone https://github.com/wieslawsoltes/PatinaStudio.git
 cd PatinaStudio
 npm start
 # Open http://localhost:4173
@@ -63,7 +64,7 @@ Use **Bake mesh maps** for actual self-occlusion ray tracing. Use **Export textu
 | `@patina/io` | PNG export, ZIP/CRC32, ORM packing, GLB geometry import and textured GLB export |
 | `@patina/ui` | SVG icons, dialogs, command palette, toasts, splitter and reusable editor styles |
 
-The editor consumes these packages rather than maintaining a second private implementation. Each has its own `package.json`, explicit dependencies, ESM exports, README and MIT license. They are source packages, not claims of published npm releases. Prepacked local tarballs are included in `archives/` in the distribution ZIP.
+The editor consumes these packages rather than maintaining a second private implementation. Each has its own `package.json`, explicit dependencies, ESM exports, README and MIT license. They are source packages, not claims of published npm releases. Prepacked local tarballs are committed in `archives/` and can be rebuilt with `npm run pack:libs`.
 
 ```sh
 # From the distribution root, in another project:
@@ -84,13 +85,31 @@ The rendering approximation converts color with a 2.2 power curve, not the exact
 
 ## Validation status
 
-The delivered implementation passed 35 Node tests and 19 Chromium UI/software-backend checks, including actual painting, mask pixels, history replay, decal replay, export contents and GLB geometry round-trip. Screenshots and machine-readable test output are included in `docs/verification/`.
+The delivered implementation passed 35 Node tests and 19 Chromium UI/software-backend checks, including actual painting, mask pixels, history replay, decal replay, export contents and GLB geometry round-trip. Both suites passed again during the repository import on GitHub Actions. Screenshots and machine-readable test output are included in `docs/verification/`.
 
-The execution environment's installed Chromium policy blocks navigation, and its WebGPU/WebGL2 contexts were unavailable. Browser checks therefore ran the original application modules in an isolated `about:blank` DOM with only local subresources routed. They did not mock the engine. **Hardware WebGPU execution, WebGL2 execution, persistent-origin IndexedDB and HTTP-origin worker loading remain unverified here.** AO math and cancellation were exercised in Node. The separate GPU validation page exists to close the hardware-validation gap, not to imply that it has already passed.
+The original delivery used a restricted Chromium environment. Its browser checks ran the original application modules in an isolated `about:blank` DOM with local subresources routed, without mocking the engine. The repository import repeated that suite and freshly captured the two screenshots. See [import provenance](docs/verification/IMPORT.md) and the [original release checksums](docs/verification/original-SHA256SUMS.txt); those historical checksums are not a manifest of later repository changes.
+
+`tests/pages_smoke.py` adds a normal HTTP-origin check at `/PatinaStudio/`, including application startup, asset responses, IndexedDB write/read and an actual module-worker bake. The Validate workflow runs it against `dist/` and uploads its report. **Hardware WebGPU and WebGL2 execution remain separate validation requirements.** Software CI does not certify GPU rendering. The separate GPU validation page reports its real results and fails explicitly without an adapter.
 
 ## Static deployment
 
-`npm run build` produces `dist/`, with relative paths suitable for a repository subpath. Serve that directory over HTTPS. `.github/workflows/pages.yml` is an opt-in manual GitHub Pages deployment; enable Pages with GitHub Actions before running it. The source archive itself has not been published or committed to any account by this delivery.
+GitHub Pages URL: **https://wieslawsoltes.github.io/PatinaStudio/**
+
+`npm run build` produces `dist/`, with relative paths suitable for the repository subpath. `.github/workflows/pages.yml` validates and builds the application, uploads the static artifact and deploys it on every push to `main`; manual dispatch is also available. Deployment uses the `github-pages` environment and scoped Pages/OIDC permissions. The `gh-pages` branch contains a validated initial static snapshot.
+
+For a new repository, Pages must be enabled under **Settings → Pages → Build and deployment → Source: GitHub Actions**. The workflow attempts first-time enablement; GitHub may require an administrator to make this one-time setting change. The workflow's successful deployment and its environment URL are the authoritative publication status.
+
+The source, all ten standalone packages, documentation, tests, sample project, rebuilt static distribution and package archives are committed directly to this repository. Temporary transfer files are removed after import; the original source remains recoverable from Git history.
+
+To reproduce the deployment smoke check:
+
+```sh
+npm ci --ignore-scripts
+npm run build
+python -m pip install playwright==1.55.0
+python -m playwright install chromium
+python tests/pages_smoke.py
+```
 
 ## License
 

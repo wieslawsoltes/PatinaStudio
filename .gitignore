@@ -2,6 +2,7 @@ node_modules/
 dist/
 generated/
 archives/
+test-artifacts/
 __pycache__/
 *.log
 .DS_Store
