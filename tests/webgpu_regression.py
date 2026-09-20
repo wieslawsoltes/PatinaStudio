@@ -26,6 +26,13 @@ class Handler(SimpleHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
+    def do_GET(self):
+        if self.path == '/favicon.ico':
+            self.send_response(204)
+            self.end_headers()
+            return
+        super().do_GET()
+
 
 with TemporaryDirectory(prefix='patina-webgpu-') as temp:
     (Path(temp) / 'PatinaStudio').symlink_to(root / 'dist', target_is_directory=True)
@@ -34,11 +41,12 @@ with TemporaryDirectory(prefix='patina-webgpu-') as temp:
     base = f'http://127.0.0.1:{server.server_port}/PatinaStudio/'
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(channel='chromium', headless=True, args=[
+            browser = p.chromium.launch(channel='chrome', headless=True, args=[
                 '--enable-unsafe-webgpu', '--enable-unsafe-swiftshader',
                 '--use-angle=swiftshader', '--disable-dev-shm-usage',
             ])
             try:
+                report['browserVersion'] = browser.version
                 page = browser.new_page(viewport={'width': 1280, 'height': 800})
                 page.on('pageerror', lambda e: report['pageErrors'].append(str(e)))
                 page.on('console', lambda m: report['consoleErrors'].append(m.text)
@@ -53,6 +61,7 @@ with TemporaryDirectory(prefix='patina-webgpu-') as temp:
                 assert response and response.status == 200
                 page.wait_for_function('!!window.__PATINA_GPU_REPORT', timeout=120000)
                 report['pipelines'] = page.evaluate('window.__PATINA_GPU_REPORT')
+                report['pipelineLog'] = page.locator('#log').inner_text()
                 assert report['pipelines']['status'] == 'passed', report['pipelines']
 
                 # Exercise the exact startup path that previously threw
