@@ -29,10 +29,12 @@ jobs:
         run: |
           python -m pip install playwright==1.55.0
           python -m playwright install --with-deps chromium
-      - name: Compile and execute WebGPU shaders and verify GPU workspace startup
-        run: python tests/webgpu_regression.py
       - name: Test repository subpath, IndexedDB and actual module-worker loading
         run: python tests/pages_smoke.py
+      - name: Compile and execute WebGPU shaders and verify GPU workspace startup
+        env:
+          DEBUG: pw:browser
+        run: python tests/webgpu_regression.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

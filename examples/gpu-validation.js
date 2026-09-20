@@ -54,12 +54,17 @@ async function run() {
         renderer = await new GPURenderer(document.querySelector('#preview'), context).init();
         renderer.setMesh(createCube());
         renderer.setMaps(gpu.composite(p));
-        renderer.render(new OrbitCamera());
+        const renderFrame = async (name, draw) => {
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            log.textContent += 'RUN   ' + name + '\n';
+            draw();
+            await context.device.queue.onSubmittedWorkDone();
+            check(name, context.errors.length === 0, context.errors.join('; '));
+        };
+        await renderFrame('PBR and background rendering', () => renderer.render(new OrbitCamera()));
         renderer.wireframe = true;
-        renderer.render(new OrbitCamera());
-        renderer.renderUV(document.querySelector('#uv'));
-        await context.device.queue.onSubmittedWorkDone();
-        check('PBR, background, wireframe and UV render pipelines', context.errors.length === 0, context.errors.join('; '));
+        await renderFrame('Wireframe rendering', () => renderer.render(new OrbitCamera()));
+        await renderFrame('UV rendering', () => renderer.renderUV(document.querySelector('#uv')));
         baker = new BakeWorker();
         const mesh = createCube();
         const maps = await baker.run(mesh, { resolution: 32, samples: 2, maxDistance: .4, mathURL: import.meta.resolve('@patina/math') }, () => {
