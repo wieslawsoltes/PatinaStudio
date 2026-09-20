@@ -45,7 +45,7 @@ fn over(old:vec4f,col:vec3f,a:f32)->vec4f {let oa=a+old.a*(1.-a);return vec4f((c
   if(p.config.y==2.){alpha*=step(.77,hash(vec2f(xy)+s.xy))*.75;}
   if(alpha<.0001){continue;}
   if(p.config.z==1.){c.a*=1.-alpha;a.a*=1.-alpha;}
-  else if(p.config.z>=2.){let target=select(1.,0.,p.config.z==3.);m=vec4f(vec3f(mix(m.r,target,alpha)),1.);}
+  else if(p.config.z>=2.){let maskValue=select(1.,0.,p.config.z==3.);m=vec4f(vec3f(mix(m.r,maskValue,alpha)),1.);}
   else{c=over(c,p.color.rgb,alpha);a=over(a,p.aux.rgb,alpha);}
  }
  textureStore(outColor,xy,c);textureStore(outAux,xy,a);textureStore(outMask,xy,m);
