@@ -47,6 +47,8 @@ with TemporaryDirectory(prefix='patina-webgpu-') as temp:
                 # Native ANGLE/Vulkan needs surface extensions absent from
                 # Chrome's bundled SwiftShader ICD.
                 '--use-gl=angle', '--use-angle=swiftshader',
+                '--use-vulkan=swiftshader', '--enable-features=Vulkan',
+                '--disable-vulkan-surface',
                 '--disable-dev-shm-usage',
             ])
             try:
