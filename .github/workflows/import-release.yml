@@ -1,0 +1,121 @@
+name: Import PatinaStudio release
+on:
+  push:
+    branches: [main]
+    paths: ['.bootstrap/**', '.github/workflows/import-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: patina-release-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify and restore original source files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -f app/main.js
+          cat .bootstrap/source.part* > "$RUNNER_TEMP/patina-source.tar.xz"
+          echo '295dfd090a9f76cd293bc54452337891129941ef9d64ec10db827aba3d0e0341  '"$RUNNER_TEMP/patina-source.tar.xz" | sha256sum -c -
+          python - <<'PY'
+          import hashlib, os, tarfile
+          from pathlib import Path, PurePosixPath
+          root = Path.cwd()
+          restored = []
+          with tarfile.open(Path(os.environ['RUNNER_TEMP']) / 'patina-source.tar.xz', 'r:xz') as archive:
+              for member in archive.getmembers():
+                  parts = PurePosixPath(member.name).parts
+                  if not parts or parts[0] != 'PatinaStudio' or '..' in parts or not member.isfile():
+                      raise ValueError(f'Unexpected archive member: {member.name}')
+                  relative = Path(*parts[1:])
+                  if str(relative).startswith('.github/workflows/'):
+                      continue
+                  target = root / relative
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(archive.extractfile(member).read())
+                  restored.append(relative)
+          checksums = {}
+          for line in Path('SHA256SUMS.txt').read_text().splitlines():
+              digest, name = line.split('  ', 1)
+              checksums[name] = digest
+          for path in restored:
+              if str(path) in checksums:
+                  assert hashlib.sha256(path.read_bytes()).hexdigest() == checksums[str(path)], path
+          print(f'Verified {len(restored)} restored files against the original release manifest.')
+          Path('docs/verification/original-SHA256SUMS.txt').write_bytes(Path('SHA256SUMS.txt').read_bytes())
+          PY
+      - name: Validate and build all standalone libraries and application
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm run check
+          npm test
+          node examples/library-usage.mjs
+          npm run build
+          npm run pack:libs
+      - name: Install isolated browser test tooling
+        run: |
+          python -m pip install playwright==1.55.0
+          python -m playwright install --with-deps chromium
+      - name: Run software integration tests and refresh screenshot evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER=$(python -c 'from playwright.sync_api import sync_playwright; p=sync_playwright().start(); print(p.chromium.executable_path); p.stop()')
+          printf '#!/bin/sh\nexec "%s" "$@" --disable-gpu --disable-webgl\n' "$BROWSER" > "$RUNNER_TEMP/chromium-software"
+          chmod +x "$RUNNER_TEMP/chromium-software"
+          export CHROMIUM_PATH="$RUNNER_TEMP/chromium-software"
+          export PATINA_ARTIFACTS="$RUNNER_TEMP/patina-browser"
+          python tests/browser_dom.py
+          cp "$PATINA_ARTIFACTS/initial.png" docs/verification/workspace-software.png
+          cp "$PATINA_ARTIFACTS/compact.png" docs/verification/compact-workspace.png
+          cp "$PATINA_ARTIFACTS/browser-report.json" docs/verification/ci-browser-report.json
+      - name: Record provenance and commit expanded release to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          report = json.loads(Path('docs/verification/ci-browser-report.json').read_text())
+          assert report['passed'] == 19 and not report['pageErrors']
+          Path('docs/verification/IMPORT.md').write_text(
+              '# Repository import provenance\n\n'
+              'All original application, engine, test, example and documentation source files were transferred without rewriting and checked against the original SHA-256 manifest.\n\n'
+              'The static distribution and ten npm package archives were rebuilt from that source. The two PNG screenshots were freshly captured by the unchanged software integration suite on GitHub Actions; they are refreshed evidence, not byte-identical copies of the original screenshots. Original reports and checksums remain available for historical comparison.\n\n'
+              f'Browser checks: {report["passed"]}; uncaught page errors: {len(report["pageErrors"])}. WebGPU hardware execution is not certified by this software test.\n\n'
+              f'Import workflow run: https://github.com/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["GITHUB_RUN_ID"]}\n')
+          paths = sorted(p for p in Path('.').rglob('*') if p.is_file() and not any(x in p.parts for x in ('.git', 'node_modules', '__pycache__', '.bootstrap')) and str(p) != 'SHA256SUMS.txt')
+          Path('SHA256SUMS.txt').write_text(''.join(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.as_posix()}\n' for p in paths))
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .
+          git add -f dist archives
+          git diff --cached --stat
+          git commit -m 'feat: import complete PatinaStudio editor, ten standalone engines, tests and distribution'
+          git push origin HEAD:main
+          echo "Imported commit: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: patinastudio-static
+          path: dist
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: patinastudio-import-evidence
+          path: |
+            ${{ runner.temp }}/patina-browser
+            archives
