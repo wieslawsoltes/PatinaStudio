@@ -19,7 +19,7 @@ out.mkdir(parents=True, exist_ok=True)
 assert (root / 'dist/index.html').is_file(), 'Run npm run build first.'
 report = {'passed': False, 'mode': 'Chromium WebGPU / SwiftShader',
           'hardwareWebGPUValidated': False, 'pageErrors': [], 'consoleErrors': [],
-          'failedRequests': []}
+          'failedRequests': [], 'gpuStages': []}
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -43,11 +43,28 @@ with TemporaryDirectory(prefix='patina-webgpu-') as temp:
         with sync_playwright() as p:
             browser = p.chromium.launch(channel='chrome', headless=True, args=[
                 '--enable-unsafe-webgpu', '--enable-unsafe-swiftshader',
-                '--use-angle=swiftshader', '--disable-dev-shm-usage',
+                '--use-angle=vulkan', '--use-vulkan=swiftshader',
+                '--enable-features=Vulkan', '--disable-vulkan-surface',
+                '--disable-dev-shm-usage',
             ])
             try:
                 report['browserVersion'] = browser.version
                 page = browser.new_page(viewport={'width': 1280, 'height': 800})
+                # Log native pipeline progress without replacing the compiler.
+                page.add_init_script('''
+                    if (globalThis.GPUDevice) {
+                        const compile = GPUDevice.prototype.createRenderPipelineAsync;
+                        GPUDevice.prototype.createRenderPipelineAsync = async function(desc) {
+                            const label = desc.label || desc.fragment?.entryPoint || 'render';
+                            console.info('GPU-STAGE begin ' + label);
+                            const result = await compile.call(this, desc);
+                            console.info('GPU-STAGE ready ' + label);
+                            return result;
+                        };
+                    }
+                ''')
+                page.on('console', lambda m: report['gpuStages'].append(m.text)
+                        if m.text.startswith('GPU-STAGE ') else None)
                 page.on('pageerror', lambda e: report['pageErrors'].append(str(e)))
                 page.on('console', lambda m: report['consoleErrors'].append(m.text)
                         if m.type == 'error' else None)
