@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-15",
+  "node": "22.16.0",
+  "browser": "Chromium 144.0.7559.96, installed runtime",
+  "navigation": "Installed managed policy blocks navigation; left unchanged",
+  "browserTest": "Application loaded in about:blank using only same-project routed subresources",
+  "actualBackend": "SoftwareRenderer + CPUPaintEngine",
+  "gpuRuntimeVerified": false,
+  "webglRuntimeVerified": false,
+  "indexedDBPersistentOriginVerified": false,
+  "workerHTTPOriginVerified": false,
+  "nodeTests": 35,
+  "browserChecks": 19,
+  "standalonePackageImports": 10,
+  "independentPackageIntegrationChecks": 1
+}

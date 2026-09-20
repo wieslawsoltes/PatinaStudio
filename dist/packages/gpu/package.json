@@ -1,0 +1,15 @@
+{
+  "name": "@patina/gpu",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PatinaStudio standalone gpu library",
+  "exports": {
+    ".": "./src/index.js",
+    "./kernels": "./src/kernels.js"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "sideEffects": false
+}

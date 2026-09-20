@@ -1,0 +1,15 @@
+{
+  "name": "@patina/mesh",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PatinaStudio standalone mesh library",
+  "exports": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
+  "dependencies": {
+    "@patina/math": "0.1.0"
+  }
+}

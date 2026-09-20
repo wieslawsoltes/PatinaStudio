@@ -1,0 +1,16 @@
+{
+  "name": "@patina/paint",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PatinaStudio standalone paint library",
+  "exports": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
+  "dependencies": {
+    "@patina/materials": "0.1.0",
+    "@patina/gpu": "0.1.0"
+  }
+}

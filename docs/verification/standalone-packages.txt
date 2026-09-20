@@ -1,0 +1,13 @@
+
+added 10 packages in 327ms
+PASS standalone import @patina/math
+PASS standalone import @patina/mesh
+PASS standalone import @patina/materials
+PASS standalone import @patina/project
+PASS standalone import @patina/gpu
+PASS standalone import @patina/paint
+PASS standalone import @patina/renderer
+PASS standalone import @patina/baker
+PASS standalone import @patina/io
+PASS standalone import @patina/ui
+PASS cross-package CPU surface generation, outside the source workspace

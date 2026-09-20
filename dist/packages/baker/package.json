@@ -1,0 +1,15 @@
+{
+  "name": "@patina/baker",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PatinaStudio standalone baker library",
+  "exports": {
+    ".": "./src/index.js",
+    "./worker.js": "./src/worker.js"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "sideEffects": false
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@patina/math",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "PatinaStudio standalone math library",
+  "exports": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "sideEffects": false
+}

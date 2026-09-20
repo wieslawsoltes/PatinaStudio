@@ -1,0 +1,5 @@
+
+> patina-studio@0.1.0 check
+> node scripts/check.mjs
+
+All JavaScript syntax checks passed.

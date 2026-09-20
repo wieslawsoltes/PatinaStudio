@@ -1,0 +1,224 @@
+
+> patina-studio@0.1.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: matrix inversion preserves a transformed point
+ok 1 - matrix inversion preserves a transformed point
+  ---
+  duration_ms: 1.37019
+  type: 'test'
+  ...
+# Subtest: singular matrices are rejected
+ok 2 - singular matrices are rejected
+  ---
+  duration_ms: 0.309057
+  type: 'test'
+  ...
+# Subtest: camera center ray points at target
+ok 3 - camera center ray points at target
+  ---
+  duration_ms: 0.386634
+  type: 'test'
+  ...
+# Subtest: ray triangle returns barycentric coordinates and rejects parallel rays
+ok 4 - ray triangle returns barycentric coordinates and rejects parallel rays
+  ---
+  duration_ms: 0.248976
+  type: 'test'
+  ...
+# Subtest: sphere primitive has finite, normalized geometry and bounded UVs
+ok 5 - sphere primitive has finite, normalized geometry and bounded UVs
+  ---
+  duration_ms: 27.085567
+  type: 'test'
+  ...
+# Subtest: artifact primitive has finite, normalized geometry and bounded UVs
+ok 6 - artifact primitive has finite, normalized geometry and bounded UVs
+  ---
+  duration_ms: 29.441177
+  type: 'test'
+  ...
+# Subtest: cube primitive has finite, normalized geometry and bounded UVs
+ok 7 - cube primitive has finite, normalized geometry and bounded UVs
+  ---
+  duration_ms: 0.451312
+  type: 'test'
+  ...
+# Subtest: torus primitive has finite, normalized geometry and bounded UVs
+ok 8 - torus primitive has finite, normalized geometry and bounded UVs
+  ---
+  duration_ms: 5.456116
+  type: 'test'
+  ...
+# Subtest: sphere winding agrees with vertex normals
+ok 9 - sphere winding agrees with vertex normals
+  ---
+  duration_ms: 8.457904
+  type: 'test'
+  ...
+# Subtest: BVH reports front face UV and misses off-axis rays
+ok 10 - BVH reports front face UV and misses off-axis rays
+  ---
+  duration_ms: 1.067333
+  type: 'test'
+  ...
+# Subtest: OBJ supports negative indices and polygon triangulation
+ok 11 - OBJ supports negative indices and polygon triangulation
+  ---
+  duration_ms: 0.773739
+  type: 'test'
+  ...
+# Subtest: OBJ missing UVs fails explicitly
+ok 12 - OBJ missing UVs fails explicitly
+  ---
+  duration_ms: 0.149697
+  type: 'test'
+  ...
+# Subtest: OBJ export and import preserve triangle count
+ok 13 - OBJ export and import preserve triangle count
+  ---
+  duration_ms: 0.526586
+  type: 'test'
+  ...
+# Subtest: mesh serialization round trips
+ok 14 - mesh serialization round trips
+  ---
+  duration_ms: 0.726959
+  type: 'test'
+  ...
+# Subtest: history supports branch-safe undo and redo
+ok 15 - history supports branch-safe undo and redo
+  ---
+  duration_ms: 0.545485
+  type: 'test'
+  ...
+# Subtest: history bounds the checkpoint count
+ok 16 - history bounds the checkpoint count
+  ---
+  duration_ms: 0.167733
+  type: 'test'
+  ...
+# Subtest: project rejects unsupported versions, resolutions and duplicate IDs
+ok 17 - project rejects unsupported versions, resolutions and duplicate IDs
+  ---
+  duration_ms: 1.936837
+  type: 'test'
+  ...
+# Subtest: every procedural material returns bounded PBR channels
+ok 18 - every procedural material returns bounded PBR channels
+  ---
+  duration_ms: 0.676612
+  type: 'test'
+  ...
+# Subtest: stroke sampler spaces stamps and does not bridge UV seams
+ok 19 - stroke sampler spaces stamps and does not bridge UV seams
+  ---
+  duration_ms: 0.225511
+  type: 'test'
+  ...
+# Subtest: UV rasterization contains visible pixels and normals
+ok 20 - UV rasterization contains visible pixels and normals
+  ---
+  duration_ms: 1.977709
+  type: 'test'
+  ...
+# Subtest: welded curvature is finite across UV seams
+ok 21 - welded curvature is finite across UV seams
+  ---
+  duration_ms: 55.401858
+  type: 'test'
+  ...
+# Subtest: AO baking returns valid maps and reports progress
+ok 22 - AO baking returns valid maps and reports progress
+  ---
+  duration_ms: 20.33927
+  type: 'test'
+  ...
+# Subtest: AO baking can be cancelled
+ok 23 - AO baking can be cancelled
+  ---
+  duration_ms: 1.469561
+  type: 'test'
+  ...
+# Subtest: CPU brush painting, erase and mask semantics are functional
+ok 24 - CPU brush painting, erase and mask semantics are functional
+  ---
+  duration_ms: 4.35335
+  type: 'test'
+  ...
+# Subtest: CPU compositor produces a non-flat height normal and layer ordering
+ok 25 - CPU compositor produces a non-flat height normal and layer ordering
+  ---
+  duration_ms: 12.447633
+  type: 'test'
+  ...
+# Subtest: ORM and normal-convention conversion are explicit
+ok 26 - ORM and normal-convention conversion are explicit
+  ---
+  duration_ms: 0.441287
+  type: 'test'
+  ...
+# Subtest: ZIP emits valid CRC and central directory
+ok 27 - ZIP emits valid CRC and central directory
+  ---
+  duration_ms: 0.381436
+  type: 'test'
+  ...
+# Subtest: project refuses CSS injection in material color
+ok 28 - project refuses CSS injection in material color
+  ---
+  duration_ms: 3.171914
+  type: 'test'
+  ...
+# Subtest: project refuses remote and SVG decals
+ok 29 - project refuses remote and SVG decals
+  ---
+  duration_ms: 0.433926
+  type: 'test'
+  ...
+# Subtest: project refuses prototype-named primitive
+ok 30 - project refuses prototype-named primitive
+  ---
+  duration_ms: 0.174073
+  type: 'test'
+  ...
+# Subtest: project rejects malformed baked map lengths
+ok 31 - project rejects malformed baked map lengths
+  ---
+  duration_ms: 0.23116
+  type: 'test'
+  ...
+# Subtest: project rejects out-of-range UVs and fractional indices before typed-array conversion
+ok 32 - project rejects out-of-range UVs and fractional indices before typed-array conversion
+  ---
+  duration_ms: 1.656303
+  type: 'test'
+  ...
+# Subtest: project rejects invalid brush bounds before replay
+ok 33 - project rejects invalid brush bounds before replay
+  ---
+  duration_ms: 0.524103
+  type: 'test'
+  ...
+# Subtest: mesh validation rejects non-finite normals
+ok 34 - mesh validation rejects non-finite normals
+  ---
+  duration_ms: 0.308076
+  type: 'test'
+  ...
+# Subtest: valid serialized mesh project round-trips
+ok 35 - valid serialized mesh project round-trips
+  ---
+  duration_ms: 0.351331
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 242.218485
